@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Yatzy
 {
@@ -8,7 +9,7 @@ namespace Yatzy
     /// If you have use code that is not in the .NET library you must clearly document where the code is from and what you have used it for.
     /// The documentation must be added as a comment at the top of the files that deal with the game class.
     /// </summary>
-    public class Program
+    internal static class Program
 
     {
         static void Main(string[] args)
