@@ -11,3 +11,16 @@
 /home/emil/Desktop/temp/Yatzy/Yatzy/obj/Debug/netcoreapp3.1/Yatzy.dll
 /home/emil/Desktop/temp/Yatzy/Yatzy/obj/Debug/netcoreapp3.1/Yatzy.pdb
 /home/emil/Desktop/temp/Yatzy/Yatzy/obj/Debug/netcoreapp3.1/Yatzy.genruntimeconfig.cache
+/home/emil/Desktop/Yatzy/Yatzy/bin/Debug/netcoreapp3.1/Yatzy
+/home/emil/Desktop/Yatzy/Yatzy/bin/Debug/netcoreapp3.1/Yatzy.deps.json
+/home/emil/Desktop/Yatzy/Yatzy/bin/Debug/netcoreapp3.1/Yatzy.runtimeconfig.json
+/home/emil/Desktop/Yatzy/Yatzy/bin/Debug/netcoreapp3.1/Yatzy.runtimeconfig.dev.json
+/home/emil/Desktop/Yatzy/Yatzy/bin/Debug/netcoreapp3.1/Yatzy.dll
+/home/emil/Desktop/Yatzy/Yatzy/bin/Debug/netcoreapp3.1/Yatzy.pdb
+/home/emil/Desktop/Yatzy/Yatzy/obj/Debug/netcoreapp3.1/Yatzy.csprojAssemblyReference.cache
+/home/emil/Desktop/Yatzy/Yatzy/obj/Debug/netcoreapp3.1/Yatzy.csproj.CoreCompileInputs.cache
+/home/emil/Desktop/Yatzy/Yatzy/obj/Debug/netcoreapp3.1/Yatzy.AssemblyInfoInputs.cache
+/home/emil/Desktop/Yatzy/Yatzy/obj/Debug/netcoreapp3.1/Yatzy.AssemblyInfo.cs
+/home/emil/Desktop/Yatzy/Yatzy/obj/Debug/netcoreapp3.1/Yatzy.dll
+/home/emil/Desktop/Yatzy/Yatzy/obj/Debug/netcoreapp3.1/Yatzy.pdb
+/home/emil/Desktop/Yatzy/Yatzy/obj/Debug/netcoreapp3.1/Yatzy.genruntimeconfig.cache

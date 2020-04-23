@@ -15,7 +15,7 @@ namespace Yatzy
             Random = new Random();
         }
 
-        // Virtual to overwrite this in biased dice
+        // Rolls the dice with a HoldState modifier
         public virtual int Roll()
         {
             if (HoldState == false)
@@ -30,7 +30,7 @@ namespace Yatzy
             return Current;
         }
 
-        // Returns current without rolling.
+        // Returns current dice values without rolling.
         public int ReturnRoll()
         {
             return Current;
@@ -40,5 +40,6 @@ namespace Yatzy
     // TODO: Inheritance Check with Biased Dice Class
     public class BiasedDice : Dice
     {
+        
     }
 }

@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/emil/Desktop/temp/Yatzy/Yatzy/Yatzy.csproj",
+      "projectUniqueName": "/home/emil/Desktop/Yatzy/Yatzy/Yatzy.csproj",
       "projectName": "Yatzy",
-      "projectPath": "/home/emil/Desktop/temp/Yatzy/Yatzy/Yatzy.csproj",
+      "projectPath": "/home/emil/Desktop/Yatzy/Yatzy/Yatzy.csproj",
       "packagesPath": "/home/emil/.nuget/packages/",
-      "outputPath": "/home/emil/Desktop/temp/Yatzy/Yatzy/obj/",
+      "outputPath": "/home/emil/Desktop/Yatzy/Yatzy/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/emil/.nuget/NuGet/NuGet.Config"

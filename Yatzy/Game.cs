@@ -1,4 +1,4 @@
-using System;
+using System;    
 using System.ComponentModel.Design;
 using System.Text.RegularExpressions;
 
@@ -12,11 +12,11 @@ namespace Yatzy
     /// </summary>
     public class Game
     {
+        private readonly Dice[] diceCup = new Dice[5];
+        // public Scoreboard Scoreboard;
         public int RollsPerTurn = 3;
         public int AmountOfRounds = 12;
         public bool gameShouldStop = false;
-
-        public readonly Dice[] diceCup = new Dice[5];
 
         public Game()
         {
@@ -37,7 +37,9 @@ namespace Yatzy
             Console.WriteLine("=============================================");
 
             // EnterPlayer();
+            
             GameStart();
+            
         }
 
         public void EnterPlayer()
@@ -66,6 +68,7 @@ namespace Yatzy
 
         public void GameStart()
         {
+            // Scoreboard scoreboard = new Scoreboard();
             Console.WriteLine("Type 'roll' to start the game.\n");
 
             while (!GameShouldStop())
