@@ -49,9 +49,14 @@ namespace Yatzy
             }
         }
 
-        public int Aces()
+        // Checks whether the user is eligible for a bonus
+        public void Bonus()
         {
-          
+            if (TotalUpperSectionSum() >= 63)
+            {
+                Scorecard.Add("Bonus", 50);
+                Console.WriteLine("Because you got a total score equal to or above 63 points in the upper section, you have been awarded an extra bonus of 50 points!");
+            }
         }
 
         public void LowerSection()
@@ -63,16 +68,6 @@ namespace Yatzy
         public int TotalUpperSectionSum()
         {
             return Scorecard.Sum(scores => scores.Value);
-        }
-
-        // Checks whether the user is eligible for a bonus
-        public void Bonus()
-        {
-            if (TotalUpperSectionSum() >= 63)
-            {
-                Scorecard.Add("Bonus", 50);
-                Console.WriteLine("Because you got a total score equal to or above 63 points in the upper section, you have been awarded an extra bonus of 50 points!");
-            }
         }
 
         public void ShowScoreboard()

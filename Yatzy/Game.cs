@@ -1,5 +1,7 @@
 using System;
 using System.ComponentModel.Design;
+using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Yatzy
@@ -12,7 +14,7 @@ namespace Yatzy
     /// </summary>
     public class Game
     {
-        private readonly Dice[] diceCup = new Dice[5];
+        public Dice[] diceCup = new Dice[6];
         public Scoreboard Scoreboard; // <-- value type (selve .exe filen i mappen)
         public int RollsPerTurn = 3;
         public int AmountOfRounds = 12;
@@ -37,8 +39,7 @@ namespace Yatzy
             Console.ResetColor();
             Console.WriteLine("=============================================");
 
-            // EnterPlayer();
-
+            EnterPlayer();
             GameStart();
 
         }
@@ -77,7 +78,8 @@ namespace Yatzy
                 switch (Console.ReadLine()?.ToLower())
                 {
                     case "roll":
-                        RollAllDice();
+                        Turns(); ;
+                        AllScorePossibilities();
                         break;
                     case "hold":
                         Hold();
@@ -103,62 +105,156 @@ namespace Yatzy
 
         public void RollAllDice()
         {
+            foreach (var aDice in diceCup)
+            {
+                aDice.Roll();
+                Console.Write($"{aDice.Current} ");
+            }
+        }
+
+        public void Turns()
+        {
             if (RollsPerTurn != 0)
             {
-                foreach (var aDice in diceCup)
-                {
-                    aDice.Roll();
-                    Console.Write($"{aDice.Current} ");
-                }
-
-                Console.WriteLine();
+                // TODO: The player must roll all six dice in the first roll.
+                // TODO: The player must then be able to hold the good dice and roll the remaining dice.
+                // TODO: The player should be able to save their scores whenever.
+                // TODO: You must be able to nicely print the result of the turn. 
+                // TODO: Automamitcally list the possible outcomes of the current status of the each
+                // TODO: Keep track of the outcomes already used by the player and the score for each
+                // TODO: Keep track of the total score
+                // TODO: Be able to drop an outcome (get a zero score), e.g., if the player only has full-house outcome left and does not have full-house.
+                RollAllDice();
+                //Console.WriteLine("\nWould you like to keep some dice? Allow for reroll.");
                 RollsPerTurn--;
-
-                if (RollsPerTurn == RollsPerTurn - 1)
-                {
-                    // ask the user whether they want to hold any dice, if no roll all dice again, if yes enter a sequence of asking which dice the user would like to keep
-                    Console.WriteLine("HERE THE USER SHOULD BE ABLE TO REROLL");
-                    foreach (var aDice in diceCup)
-                    {
-                        aDice.Roll();
-                        Console.Write($"{aDice.Current} ");
-                    }
-                }
-
-                if (RollsPerTurn == 0)
-                {
-                    Console.WriteLine("Out of rolls this turn.");
-
-                    // Force the user to save a value before doing next lines of code
-                    AmountOfRounds--;
-                    RollsPerTurn = 3;
-                    Scoreboard.CheckUpperSection();
-                }
             }
 
-            // When rounds reach 12, the game will stop and print final scoreboard
-            if (GameShouldStop())
+            if (RollsPerTurn == 0)
             {
+                // Force the user to save a value before doing next lines of code
+                Console.WriteLine("\nOut of rolls this turn.");
+                AmountOfRounds--;
+                RollsPerTurn = 3;
+                Scoreboard.CheckUpperSection();
+                // When rounds reach 12, the game will stop and print final scoreboard
                 GameShouldStop();
-                Console.WriteLine("Thanks for playing!");
-                Console.ReadKey();
             }
         }
 
 
-        // Calculations and/or methods to check what is rolled
+        // TODO: Upper section: the player must do these in any order (if total score of upper is 63 points or above the player gets a 50 points bonus, SUPPORT THE BONUS!)
+        // TODO: Play the two sections in order
+        // TODO: Yatzy Scores: https://www.rolld6.com/2013/artikkelit/yatzy-eng/
 
+        public void Ones()
+        {
+
+        }
+
+        public void Twos()
+        {
+
+        }
+
+        public void Threes()
+        {
+
+        }
+
+        public void Fours()
+        {
+
+        }
+
+        public void Fives()
+        {
+
+        }
+
+
+        // TODO: The remaining outcomes will be played in any order
+
+        public void OnePair()
+        {
+
+        }
+
+        public void TwoPair()
+        {
+
+        }
+
+        public void ThreeOfAKind()
+        {
+
+        }
+
+        public void FourOfAKind()
+        {
+
+        }
+
+        public void SmallStraight()
+        {
+
+        }
+
+        public void LargeStraight()
+        {
+
+        }
+
+        public void FullHouse()
+        {
+
+        }
+
+        public void Yatzy()
+        {
+
+        }
+
+        // Returns the total sum of roll 
         public int Chance()
         {
-            int sum = 0;
-            foreach (var aDice in diceCup )
+            var sum = 0;
+            foreach (var aDice in diceCup)
             {
                 sum += aDice.Current;
             }
-
+            Console.WriteLine($"\nSum of roll this turn is: {sum}");
             return sum;
         }
 
+        // This should take an integer argument e.g, NumberOf(4) retunrs the number of fours found in the five dice.
+        public int NumberOf(int number)
+        {
+            var count = 0;
+            foreach (var aDice in diceCup)
+            {
+                if (aDice.Current == number)
+                    count++;
+            }
+
+            if (count != 0)
+            {
+                Console.WriteLine($"You have {count} dice of {number}s");
+            }
+
+            return count;
+        }
+
+        // Collect all single calculations methods in here, present it during the roll round
+        public void AllScorePossibilities()
+        {
+            Chance();
+            NumberOf(6);
+            NumberOf(5);
+            NumberOf(4);
+            NumberOf(3);
+            NumberOf(2);
+            NumberOf(1);
+        }
 
         public void Hold()
         {
@@ -228,14 +324,10 @@ namespace Yatzy
             if (AmountOfRounds == 0)
             {
                 gameShouldStop = true;
+                Console.WriteLine("Thanks for playing!");
+                Console.ReadKey();
             }
-
             return gameShouldStop;
         }
     }
 }
-
-// TODO: Automatically list the possible outcomes of the current status of the turn
-// TODO: Keep track of the outcomes already used by the player and the score for each
-// TODO: Keep track of the total score
-// TODO: Be able to drop an outcome(get a zero score), e.g., if the player only has full-house outcome left and does not have full-house

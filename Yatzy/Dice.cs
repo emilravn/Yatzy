@@ -1,4 +1,5 @@
 using System;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Yatzy
 {
@@ -10,9 +11,11 @@ namespace Yatzy
     public class Dice
     {
         // To avoid an identical series of random numbers, create a single Random object instead of multiple Random objects. This make the dice(s) fair and random
-        private readonly Random Random;
-        public int Current { get; set; }
-        public bool HoldState { get; set; }
+        public readonly Random Random;
+        public int Current { get; set; } // Holds the curent value of the dice
+
+        public bool HoldState { get; set; } // Determines whether a dice is held or not
+        // TODO: You must be able to hold the current value of the dice
 
         public Dice()
         {
@@ -24,18 +27,15 @@ namespace Yatzy
             return Current = Random.Next(1, 7);
         }
 
-        public int ReturnRoll()
-        {
-            return Current;
-        }
-
         public override string ToString()
         {
-            return "Current Value of Dice: ";
+            return $"Current value is {Current}.";
         }
     }
 
     // TODO: Inheritance Check with Biased Dice Class
+    // TODO: You must be able to change the degree of a positively/negatively biased dice during the game
+    // TODO: You must be able to demonstrate (in code) that a dice is fair/positive-biased/negative-biased
     public class BiasedDice : Dice
     {
         
