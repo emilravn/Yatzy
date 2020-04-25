@@ -35,6 +35,20 @@ namespace Yatzy
             };
         }
 
+        public void ShowScoreboard()
+        {
+            foreach (KeyValuePair<string, int> score in Scorecard)
+            {
+                Console.WriteLine($"{score.Key} {score.Value}");
+            }
+        }
+
+        // Computes the sum of the sequence of the int values in the dictionary above.
+        public int TotalSum()
+        {
+            return Scorecard.Sum(scores => scores.Value);
+        }
+
         public void CheckUpperSection()
         {
             if (Scorecard["Aces"] != 0 &&
@@ -45,36 +59,16 @@ namespace Yatzy
                 Scorecard["Sixes"] != 0)
             {
                 Bonus();
-                LowerSection();
             }
         }
 
         // Checks whether the user is eligible for a bonus
         public void Bonus()
         {
-            if (TotalUpperSectionSum() >= 63)
+            if (TotalSum() >= 63)
             {
                 Scorecard.Add("Bonus", 50);
                 Console.WriteLine("Because you got a total score equal to or above 63 points in the upper section, you have been awarded an extra bonus of 50 points!");
-            }
-        }
-
-        public void LowerSection()
-        {
-            Console.WriteLine("Lower Section Initiated");
-        }
-
-        // Computes the sum of the sequence of the int values in the dictionary above.
-        public int TotalUpperSectionSum()
-        {
-            return Scorecard.Sum(scores => scores.Value);
-        }
-
-        public void ShowScoreboard()
-        {
-            foreach (KeyValuePair<string, int> score in Scorecard)
-            {
-                Console.WriteLine($"{score.Key} {score.Value}");
             }
         }
     }

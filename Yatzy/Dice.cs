@@ -1,12 +1,10 @@
 using System;
-using System.Reflection.Metadata.Ecma335;
 
 namespace Yatzy
 {
     /// <summary>
     /// This class tells us how a single instance of a dice will behave. You will find two properties here, one for storing the current value and one for whether a dice is held or not.
-    /// The constructor builds a dice. The Roll() method rolls the dice between 1-6 (inclusive). The ReturnRoll() method returns what is rolled without rolling it.
-    /// The ToString() methods is how a dice will be represented if writing out the dice to the console without methods on it.
+    /// The constructor builds a dice. The Roll() method rolls the dice between 1-6 (inclusive).
     /// </summary>
     public class Dice
     {
@@ -33,11 +31,77 @@ namespace Yatzy
         }
     }
 
-    // TODO: Inheritance Check with Biased Dice Class
-    // TODO: You must be able to change the degree of a positively/negatively biased dice during the game
-    // TODO: You must be able to demonstrate (in code) that a dice is fair/positive-biased/negative-biased
+    /// <summary>
+    /// This class inherits from the Dice class. The BiasedDice can either be positively or negatively biased during the game.
+    /// TODO: You must be able to spawn biased dice and change their degree during the game.
+    /// </summary>
     public class BiasedDice : Dice
     {
-        
+        private int biasDegree { get; set; }
+        private bool isNegative { get; set; }
+
+        public override int Roll()
+        {
+            base.Roll();
+
+            // The dice is negative. 0 = average, 1 = worse than average, 2 = worser than average.
+            if (isNegative)
+            {
+                switch (biasDegree)
+                {
+                    case 0:
+                        while (Current > 5)
+                        {
+                            base.Roll();
+                        }
+                        break;
+                    case 1:
+                        while (Current > 4)
+                        {
+                            base.Roll();
+                        }
+                        break;
+                    case 2:
+                        while (Current > 3)
+                        {
+                            base.Roll();
+                        }
+                        break;
+                    default:
+                        Console.WriteLine("You can set the negatively biased dice degree between 0-2.");
+                        break;
+                }
+
+                // The dice is positive. 0 = average, 1 = better than average, 2 = bestest (WoW reference, heck)
+                if (!isNegative)
+                {
+                    switch (biasDegree)
+                    {
+                        case 0:
+                            while (Current < 3)
+                            {
+                                base.Roll();
+                            }
+                            break;
+                        case 1:
+                            while (Current < 4)
+                            {
+                                base.Roll();
+                            }
+                            break;
+                        case 2:
+                            while (Current < 5)
+                            {
+                                base.Roll();
+                            }
+                            break;
+                        default:
+                            Console.WriteLine("You can set the negatively biased dice degree between 0-2.");
+                            break;
+                    }
+                }
+            }
+            return Current;
+        }
     }
 }

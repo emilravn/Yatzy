@@ -1,7 +1,4 @@
 using System;
-using System.ComponentModel.Design;
-using System.IO;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Yatzy
@@ -14,15 +11,14 @@ namespace Yatzy
     /// </summary>
     public class Game
     {
-        public Dice[] diceCup = new Dice[6];
-        public Scoreboard Scoreboard; // <-- value type (selve .exe filen i mappen)
-        public int RollsPerTurn = 3;
-        public int AmountOfRounds = 12;
-        public bool gameShouldStop = false;
+        private readonly Dice[] diceCup = new Dice[5];
+        private readonly Scoreboard Scoreboard; // <-- value type (selve .exe filen i mappen)
+        private int RollsPerTurn = 3;
+        private int AmountOfRounds = 12;
 
         public Game()
         {
-            for (int i = 0; i < diceCup.Length; i++)
+            for (var i = 0; i < diceCup.Length; i++)
             {
                 diceCup[i] = new Dice();
             }
@@ -41,10 +37,9 @@ namespace Yatzy
 
             EnterPlayer();
             GameStart();
-
         }
 
-        public void EnterPlayer()
+        private void EnterPlayer()
         {
             Console.Write("Enter your name: ");
             string PlayerInput = Console.ReadLine();
@@ -64,21 +59,19 @@ namespace Yatzy
             }
 
             Console.WriteLine("You can get an overview of available commands by typing 'help' into the command line");
+            Console.WriteLine("Type 'roll' to start the game.");
 
             GameStart();
         }
 
-        public void GameStart()
+        private void GameStart()
         {
-
-            Console.WriteLine("Type 'roll' to start the game.");
-
-            while (!GameShouldStop())
+            while (GameShouldStop())
             {
                 switch (Console.ReadLine()?.ToLower())
                 {
                     case "roll":
-                        Turns(); ;
+                        Turns();
                         AllScorePossibilities();
                         break;
                     case "hold":
@@ -103,7 +96,7 @@ namespace Yatzy
             }
         }
 
-        public void RollAllDice()
+        private void RollAllDice()
         {
             foreach (var aDice in diceCup)
             {
@@ -112,7 +105,7 @@ namespace Yatzy
             }
         }
 
-        public void Turns()
+        private void Turns()
         {
             if (RollsPerTurn != 0)
             {
@@ -136,39 +129,41 @@ namespace Yatzy
                 AmountOfRounds--;
                 RollsPerTurn = 3;
                 Scoreboard.CheckUpperSection();
-                // When rounds reach 12, the game will stop and print final scoreboard
-                GameShouldStop();
             }
         }
-
 
         // TODO: Upper section: the player must do these in any order (if total score of upper is 63 points or above the player gets a 50 points bonus, SUPPORT THE BONUS!)
         // TODO: Play the two sections in order
         // TODO: Yatzy Scores: https://www.rolld6.com/2013/artikkelit/yatzy-eng/
 
-        public void Ones()
+        public int Ones()
         {
-
+            return NumberOf(1);
         }
 
-        public void Twos()
+        public int Twos()
         {
-
+            return NumberOf(2);
         }
 
-        public void Threes()
+        public int Threes()
         {
-
+            return NumberOf(3);
         }
 
-        public void Fours()
+        public int Fours()
         {
-
+            return NumberOf(4);
         }
 
-        public void Fives()
+        public int Fives()
         {
+            return NumberOf(5);
+        }
 
+        public int Sixes()
+        {
+            return NumberOf(6);
         }
 
 
@@ -215,7 +210,7 @@ namespace Yatzy
         }
 
         // Returns the total sum of roll 
-        public int Chance()
+        private int Chance()
         {
             var sum = 0;
             foreach (var aDice in diceCup)
@@ -227,7 +222,7 @@ namespace Yatzy
         }
 
         // This should take an integer argument e.g, NumberOf(4) retunrs the number of fours found in the five dice.
-        public int NumberOf(int number)
+        private int NumberOf(int number)
         {
             var count = 0;
             foreach (var aDice in diceCup)
@@ -238,40 +233,45 @@ namespace Yatzy
 
             if (count != 0)
             {
-                Console.WriteLine($"You have {count} dice of {number}s");
+                Console.WriteLine($"You have {count} dice of {number}s for a scoring value of {number*count}.");
             }
 
             return count;
         }
 
         // Collect all single calculations methods in here, present it during the roll round
-        public void AllScorePossibilities()
+        private void AllScorePossibilities()
         {
             Chance();
-            NumberOf(6);
-            NumberOf(5);
-            NumberOf(4);
-            NumberOf(3);
-            NumberOf(2);
-            NumberOf(1);
+            Ones();
+            Twos();
+            Threes();
+            Fours();
+            Fives();
+            Sixes();
         }
 
-        public void Hold()
+        public void Save()
+        {
+            
+        }
+
+        private void Hold()
         {
             Console.WriteLine("WIP");
         }
 
-        public void Score()
+        private void Score()
         {
             Scoreboard.ShowScoreboard();
         }
 
-        public void Bias()
+        private void Bias()
         {
-            Console.WriteLine("Feature coming soon!");
+            Console.WriteLine("WIP");
         }
 
-        public void Help()
+        private void Help()
         {
             Console.WriteLine("1. Roll");
             Console.WriteLine("2. Hold");
@@ -311,7 +311,7 @@ namespace Yatzy
             }
         }
 
-        public static void Exit()
+        private static void Exit()
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("Thank you very much for playing!");
@@ -319,15 +319,16 @@ namespace Yatzy
             Environment.Exit(1);
         }
 
-        public bool GameShouldStop()
+        private bool GameShouldStop()
         {
             if (AmountOfRounds == 0)
             {
-                gameShouldStop = true;
-                Console.WriteLine("Thanks for playing!");
-                Console.ReadKey();
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.Write($"Your final score was: {Scoreboard.TotalSum()}");
+                Console.ResetColor();
+                Console.WriteLine("\nThanks for playing!");
             }
-            return gameShouldStop;
+            return true;
         }
     }
 }
