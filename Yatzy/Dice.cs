@@ -2,27 +2,27 @@ using System;
 
 namespace Yatzy
 {
-    /// <summary>
-    /// This class tells us how a single instance of a dice will behave. You will find two properties here, one for storing the current value and one for whether a dice is held or not.
-    /// The constructor builds a dice. The Roll() method rolls the dice between 1-6 (inclusive).
-    /// </summary>
     public class Dice
     {
-        // To avoid an identical series of random numbers, create a single Random object instead of multiple Random objects. This make the dice(s) fair and random
         public readonly Random Random;
-        public int Current { get; set; } // Holds the curent value of the dice
+        public int Current { get; set; }
+        public bool Hold { get; set; } // TODO: You must be able to hold the current value of the dice.
 
-        public bool HoldState { get; set; } // Determines whether a dice is held or not
-        // TODO: You must be able to hold the current value of the dice
-
+        // The normal dice is not affected by any behaviour of the user, therefore the default behaviour of a normal dice is just a random dice.
         public Dice()
         {
+            Hold = false;
             Random = new Random();
         }
 
         public virtual int Roll()
         {
-            return Current = Random.Next(1, 7);
+            if (Hold == false)
+            {
+                Current = Random.Next(1, 7);
+
+            }
+            return Current;
         }
 
         public override string ToString()
@@ -31,74 +31,79 @@ namespace Yatzy
         }
     }
 
-    /// <summary>
-    /// This class inherits from the Dice class. The BiasedDice can either be positively or negatively biased during the game.
-    /// TODO: You must be able to spawn biased dice and change their degree during the game.
-    /// </summary>
     public class BiasedDice : Dice
     {
-        private int biasDegree { get; set; }
-        private bool isNegative { get; set; }
+        public int DieDegree { get; set; }
+        public bool DieNegative { get; set; } = true;
+
+        // When biased dice is being selected for use, this will be the default behaviour of those dice.
+        public BiasedDice()
+        {
+            DieDegree = 1; // Selectable from 1-3 where 1 averagely does better/worse than a fair dice. The further the number (2-3) the more unfair the dice becomes.
+            DieNegative = DieNegative;
+        }
+
+        public BiasedDice(int DieDegree, bool dieNegative)
+        {
+            this.DieDegree = DieDegree;
+            this.DieNegative = dieNegative;
+        }
 
         public override int Roll()
         {
             base.Roll();
-
-            // The dice is negative. 0 = average, 1 = worse than average, 2 = worser than average.
-            if (isNegative)
+            if (DieNegative) // The die will be negative (true).
             {
-                switch (biasDegree)
+                switch (DieDegree)
                 {
-                    case 0:
+                    case 1: // You can hit 5 but you can't hit over 5.
                         while (Current > 5)
                         {
                             base.Roll();
                         }
                         break;
-                    case 1:
+                    case 2: // You can hit 4 but you can't hit over 4.
                         while (Current > 4)
                         {
                             base.Roll();
                         }
                         break;
-                    case 2:
+                    case 3: // You can hit 3 but you can't hit over 3.
                         while (Current > 3)
                         {
                             base.Roll();
                         }
                         break;
                     default:
-                        Console.WriteLine("You can set the negatively biased dice degree between 0-2.");
-                        break;
-                }
+                        return Current;
 
-                // The dice is positive. 0 = average, 1 = better than average, 2 = bestest (WoW reference, heck)
-                if (!isNegative)
+                }
+            }
+            else if (!DieNegative) // The die will be positive (true).
+            {
+                switch (DieDegree)
                 {
-                    switch (biasDegree)
-                    {
-                        case 0:
-                            while (Current < 3)
-                            {
-                                base.Roll();
-                            }
-                            break;
-                        case 1:
-                            while (Current < 4)
-                            {
-                                base.Roll();
-                            }
-                            break;
-                        case 2:
-                            while (Current < 5)
-                            {
-                                base.Roll();
-                            }
-                            break;
-                        default:
-                            Console.WriteLine("You can set the negatively biased dice degree between 0-2.");
-                            break;
-                    }
+                    case 0: // You can't hit less than 3.
+                        while (Current < 3)
+                        {
+                            base.Roll();
+                        }
+                        break;
+                    case 1: // You can't hit less than 4.
+                        while (Current < 4)
+                        {
+                            base.Roll();
+                        }
+                        break;
+                    case 2: // You can't hit less than 5.
+                        while (Current < 5)
+                        {
+                            base.Roll();
+                        }
+                        break;
+                    default:
+                        return Current;
+
                 }
             }
             return Current;

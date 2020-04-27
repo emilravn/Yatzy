@@ -1,12 +1,10 @@
-﻿using System;
-
-namespace Yatzy
+﻿namespace Yatzy
 {
-    internal static class Program
+    public static class Program
     {
-        static void Main(string[] args)
+        private static void Main()
         {
-            Game Yatzy = new Game();
+            var Yatzy = new Game();
             Yatzy.GameSetup();
         }
     }
