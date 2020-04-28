@@ -35,7 +35,6 @@ namespace Yatzy
 
         }
 
-        // This methods simply shows the user the current scoreboard upon typing 'score' into the command line.
         public void ShowScoreboard()
         {
             foreach (KeyValuePair<string, int?> score in Scorecard)
@@ -46,7 +45,6 @@ namespace Yatzy
             Console.WriteLine($"Current Score: {TotalSum()}");
         }
 
-        // This method calculates the total sum of all values in the scoreboard.
         public int? TotalSum()
         {
             return Scorecard.Sum(scores => scores.Value);

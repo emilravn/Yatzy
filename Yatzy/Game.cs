@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
@@ -17,27 +19,27 @@ namespace Yatzy
     ///
     /// 
     /// </summary>
+    ///
+    /// Generelle kommentarer er dumme som f.eks. en metode gør det her, men hvis vi kommer i tanke om noget, må vi godt skrive det i kommentarer.
+    /// Hvis det er noget der hjælper os med at forstå koden, så må vi godt skrive dem.
+    /// De bedste kommentarer til en selv er i form af klasse og metode navne.
     public class Game
     {
         private readonly Dice[] diceCup = new Dice[5];
         private readonly Scoreboard Scoreboard;
         public int Rounds { get; set; }
-        private int RollBones { get; set; } = 3;
+        private static int RollBones = 3;
         // TODO: Ændres pt. to steder i programmet
-
 
         public Game()
         {
             for (var i = 0; i < diceCup.Length; i++)
             {
                 diceCup[i] = new Dice();
-                // diceCup[i] = new BiasedDice(1, true);
             }
 
             Scoreboard = new Scoreboard();
         }
-
-        // TODO: Description
         public void GameSetup()
         {
             Console.WriteLine("=============================================");
@@ -53,8 +55,6 @@ namespace Yatzy
 
             GameStart();
         }
-
-        // TODO: Description
         private void GameStart()
         {
             while (!GameShouldStop())
@@ -94,8 +94,6 @@ namespace Yatzy
                 }
             }
         }
-
-        // TODO: Description
         private void Roll()
         {
             if (RollBones != 0)
@@ -124,8 +122,6 @@ namespace Yatzy
                 }
             }
         }
-
-        // TODO: Description
         private int NumberOf(int number)
         {
             var count = 0;
@@ -138,7 +134,8 @@ namespace Yatzy
             return count * number;
         }
 
-        // TODO: Description
+        // This method is condensed of three other methods. The first if-statement checks whether the upper section is finished and looks into the Bonus() method that checks if the user is eligible for a bonus.
+        // The method SaveMethods() are a bunch of other saving-related methods that has been condensed for better readability.
         private void Save()
         {
             if (!CheckIfUpperShouldEnd())
@@ -151,17 +148,12 @@ namespace Yatzy
                 SaveMethods();
             }
         }
-
-        // TODO: Description
         private void SaveMethods()
         {
             ScorePossibilities();
             FinalSave();
             Score();
-            Console.WriteLine("A new round has begun.");
         }
-
-        // TODO: Description
         private void ScorePossibilities()
         {
             if (!CheckIfUpperShouldEnd())
@@ -193,46 +185,44 @@ namespace Yatzy
             }
             else
             {
-                //    if (Scoreboard.Scorecard["One Pair"] == null)
-                //    {
-                //        Console.WriteLine($"You can score in (1) One Pair for {OnePair()} points!");
-                //    }
-                //    if (Scoreboard.Scorecard["Two Pair"] == null)
-                //    {
-                //        Console.WriteLine($"You can score in (2) Two Pair for {TwoPair()} points!");
-                //    }
-                //    if (Scoreboard.Scorecard["Three of a Kind"] == null)
-                //    {
-                //        Console.WriteLine($"You can score in (3) Three of a Kind for {ThreeOfAKind()} points!");
-                //    }
-                //    if (Scoreboard.Scorecard["Four of a Kind"] == null)
-                //    {
-                //        Console.WriteLine($"You can score in (4) Four of a Kind for {FourOfAKind()} points!");
-                //    }
-                //    if (Scoreboard.Scorecard["Small Straight"] == null)
-                //    {
-                //        Console.WriteLine($"You can score in (5) Full House for {SmallStraight()} points!");
-                //    }
-                //    if (Scoreboard.Scorecard["Large Straight"] == null)
-                //    {
-                //        Console.WriteLine($"You can score in (6) Small Straight for {LargeStraight()} points!");
-                //    }
-                //    if (Scoreboard.Scorecard["Full House"] == null)
-                //    {
-                //        Console.WriteLine($"You can score in (7) Large Straight for {FullHouse()} points!");
-                //    }
-                //    if (Scoreboard.Scorecard["Yatzy"] == null)
-                //    {
-                //        Console.WriteLine($"You can score in (8) Yatzy for {Yatzy()} points!");
-                //    }
+                if (Scoreboard.Scorecard["One Pair"] == null)
+                {
+                    Console.WriteLine($"You can score in (1) One Pair for {OnePair()} points!");
+                }
+                if (Scoreboard.Scorecard["Two Pair"] == null)
+                {
+                    Console.WriteLine($"You can score in (2) Two Pair for {TwoPair()} points!");
+                }
+                if (Scoreboard.Scorecard["Three of a Kind"] == null)
+                {
+                    Console.WriteLine($"You can score in (3) Three of a Kind for {ThreeOfAKind()} points!");
+                }
+                if (Scoreboard.Scorecard["Four of a Kind"] == null)
+                {
+                    Console.WriteLine($"You can score in (4) Four of a Kind for {FourOfAKind()} points!");
+                }
+                if (Scoreboard.Scorecard["Small Straight"] == null)
+                {
+                    Console.WriteLine($"You can score in (5) Small Straight for {SmallStraight()} points!");
+                }
+                if (Scoreboard.Scorecard["Large Straight"] == null)
+                {
+                    Console.WriteLine($"You can score in (6) Large Straight for {LargeStraight()} points!");
+                }
+                if (Scoreboard.Scorecard["Full House"] == null)
+                {
+                    Console.WriteLine($"You can score in (7) Full House for {FullHouse()} points!");
+                }
+                if (Scoreboard.Scorecard["Yatzy"] == null)
+                {
+                    Console.WriteLine($"You can score in (8) Yatzy for {Yatzy()} points!");
+                }
                 if (Scoreboard.Scorecard["Chance"] == null)
                 {
                     Console.WriteLine($"You can score in (9) Chance for {Chance()} points!");
                 }
             }
         }
-
-        // TODO: Description
         public void FinalSave()
         {
 
@@ -346,7 +336,7 @@ namespace Yatzy
                     case 1:
                         if (Scoreboard.Scorecard["One Pair"] == null)
                         {
-                            //Scoreboard.Scorecard["One Pair"] = OnePair();
+                            Scoreboard.Scorecard["One Pair"] = OnePair();
                             Console.ForegroundColor = ConsoleColor.Green;
                             Console.WriteLine("One Pair saved!");
                             Console.ResetColor();
@@ -361,7 +351,7 @@ namespace Yatzy
                     case 2:
                         if (Scoreboard.Scorecard["Two Pair"] == null)
                         {
-                            //Scoreboard.Scorecard["Two Pair"] = TwoPair();
+                            Scoreboard.Scorecard["Two Pair"] = TwoPair();
                             Console.ForegroundColor = ConsoleColor.Green;
                             Console.WriteLine("Two Pair saved!");
                             Console.ResetColor();
@@ -376,7 +366,7 @@ namespace Yatzy
                     case 3:
                         if (Scoreboard.Scorecard["Three of a Kind"] == null)
                         {
-                            //Scoreboard.Scorecard["Three of a Kind"] = ThreeOfAKind();
+                            Scoreboard.Scorecard["Three of a Kind"] = ThreeOfAKind();
                             Console.ForegroundColor = ConsoleColor.Green;
                             Console.WriteLine("Three of a Kind saved!");
                             Console.ResetColor();
@@ -391,7 +381,7 @@ namespace Yatzy
                     case 4:
                         if (Scoreboard.Scorecard["Four of a Kind"] == null)
                         {
-                            //Scoreboard.Scorecard["Four of a Kind"] = FourOfAKind();
+                            Scoreboard.Scorecard["Four of a Kind"] = FourOfAKind();
                             Console.ForegroundColor = ConsoleColor.Green;
                             Console.WriteLine("Four of a Kind saved!");
                             Console.ResetColor();
@@ -406,7 +396,7 @@ namespace Yatzy
                     case 5:
                         if (Scoreboard.Scorecard["Small Straight"] == null)
                         {
-                            //Scoreboard.Scorecard["Small Straight"] = SmallStraight();
+                            Scoreboard.Scorecard["Small Straight"] = SmallStraight();
                             Console.ForegroundColor = ConsoleColor.Green;
                             Console.WriteLine("Small Straight saved!");
                             Console.ResetColor();
@@ -421,7 +411,7 @@ namespace Yatzy
                     case 6:
                         if (Scoreboard.Scorecard["Large Straight"] == null)
                         {
-                            //Scoreboard.Scorecard["Large Straight"] = LargeStraight();
+                            Scoreboard.Scorecard["Large Straight"] = LargeStraight();
                             Console.ForegroundColor = ConsoleColor.Green;
                             Console.WriteLine("Small Straight saved!");
                             Console.ResetColor();
@@ -435,7 +425,7 @@ namespace Yatzy
                     case 7:
                         if (Scoreboard.Scorecard["Full House"] == null)
                         {
-                            //Scoreboard.Scorecard["Full House"] = FullHouse();
+                            Scoreboard.Scorecard["Full House"] = FullHouse();
                             Console.ForegroundColor = ConsoleColor.Green;
                             Console.WriteLine("Full House saved!");
                             Console.ResetColor();
@@ -449,7 +439,7 @@ namespace Yatzy
                     case 8:
                         if (Scoreboard.Scorecard["Yatzy"] == null)
                         {
-                            //Scoreboard.Scorecard["Yatzy"] = Yatzy();
+                            Scoreboard.Scorecard["Yatzy"] = Yatzy();
                             Console.ForegroundColor = ConsoleColor.Green;
                             Console.WriteLine("Yatzy saved!");
                             Console.ResetColor();
@@ -482,7 +472,6 @@ namespace Yatzy
             }
         }
 
-        // TODO: Description
         public void ResetCurrentAndHold()
         {
             foreach (var aDice in diceCup)
@@ -491,22 +480,20 @@ namespace Yatzy
                 aDice.Hold = false;
             }
 
-            RollBones = 3;
+            RollBones = 3; // TODO: Ændres pt. to steder i programmet.
             Rounds++;
         }
-
-        // Method that checks if the user is eligible for a bonus once the round ends.
         public void Bonus()
         {
             if (Scoreboard.TotalSum() >= 63 && CheckIfUpperShouldEnd())
             {
                 Scoreboard.Scorecard["Bonus"] = 50;
-                Console.WriteLine("Sum is equal to or greater than 63, therefore you get a bonus of 50 points!");
+                Console.WriteLine("For having a sum greater than 62, you get 50 bonus points!\nLower Section: UNLOCKED");
             }
             else if (CheckIfUpperShouldEnd())
             {
                 Scoreboard.Scorecard["Bonus"] = 0;
-                Console.WriteLine("Sum is not equal to or greater than 63, therefore you get don't a bonus of 50 points.");
+                Console.WriteLine("Sum is not greater than 63, therefore you don't get 50 bonus points.\nLower Section: UNLOCKED");
             }
         }
 
@@ -522,56 +509,68 @@ namespace Yatzy
 
             return UpperSectionCheck;
         }
-
-        // TODO: Description
-        public void OnePair() // alle lower sections skal returnere en int for deres calculation, ingen bool, da det stadig skal være muligt at score 0
+        public int OnePair() // 2 dice with the same faces. The score is the total of these two die faces.
         {
-            // 2 dice with the same faces. The score is the total of these two die faces.
+            var sum = 0;
+            for (int i = 6; i >= 1; i--)
+            {
+                if (NumberOf(i) > 1)
+                {
+                    sum = NumberOf(i) * 2;
+                }
+            }
+            return sum;
+        }
+        public int TwoPair() // One pair, and another pair of dice with different faces from each other. The score is the total of these four die faces. Example: 6+6+5+5=22
+        {
+            var sum = 0;
+            return sum;
+
+        }
+        public int ThreeOfAKind() //  For 3 of a kind, 3 die faces must be the same; for 4 of a kind, 4 must be the same. The score is the total of all the 3 or 4 dice
+        {
+            var sum = 0;
+
+            return sum;
         }
 
         // TODO: Description
-        public void TwoPair()
+        public int FourOfAKind() //  For 3 of a kind, 3 die faces must be the same; for 4 of a kind, 4 must be the same. The score is the total of all the 3 or 4 dice
         {
-            // One pair, and another pair of dice with different faces from each other. The score is the total of these four die faces. Example: 6+6+5+5=22
-        }
+            var sum = 0;
+            return sum;
 
-        // TODO: Description
-        public void ThreeOfAKind()
+        }
+        public int SmallStraight()
         {
-            //  For 3 of a kind, 3 die faces must be the same; for 4 of a kind, 4 must be the same. The score is the total of all the 3 or 4 dice
-        }
+            var sum = 0;
+            if (NumberOf(1) == 1 && NumberOf(2) == 2 && NumberOf(3) == 3 && NumberOf(4) == 4 && NumberOf(5) == 5)
+            {
+                sum = 15;
+            }
+            return sum;
 
-        // TODO: Description
-        public void FourOfAKind()
+        }
+        public int LargeStraight()
         {
-            //  For 3 of a kind, 3 die faces must be the same; for 4 of a kind, 4 must be the same. The score is the total of all the 3 or 4 dice
+            var sum = 0;
+            if (NumberOf(2) == 2 && NumberOf(3) == 3 && NumberOf(4) == 4 && NumberOf(5) == 5 && NumberOf(6) == 6)
+            {
+                sum = 20;
+            }
+            return sum;
         }
-
-        // TODO: Description
-        public void SmallStraight()
+        public int FullHouse() //  A Full House as in poker is a combination of 3 of a kind and 2 of a kind. The score is the total of the die faces. Example: 6+6+6+5+5=28
         {
-            //  A straight is a sequence of consecutive die faces; a small straight is made up of die faces 1-2-3-4-5 and scores 15 points; a large straight is made up of die faces 2-3-4-5-6 and scores 20 points.
+            var sum = 0;
+            return sum;
         }
-
-        // TODO: Description
-        public void LargeStraight()
+        public int Yatzy()  // Yatzy is 5 of a kind and scores 50 points, but you can choose to score the roll in other categories instead. Example: You roll 6-6-6-6-6. You can choose to score this as a Yatzy (50), 4 of a kind (24) or in the Upper Section ‘6’ (30).
         {
-            //  A straight is a sequence of consecutive die faces; a small straight is made up of die faces 1-2-3-4-5 and scores 15 points; a large straight is made up of die faces 2-3-4-5-6 and scores 20 points.
-        }
+            var sum = 0;
+            return sum;
 
-        // TODO: Description
-        public void FullHouse()
-        {
-            //  A Full House as in poker is a combination of 3 of a kind and 2 of a kind. The score is the total of the die faces. Example: 6+6+6+5+5=28
         }
-
-        // TODO: Description
-        public void Yatzy()
-        {
-            // Yatzy is 5 of a kind and scores 50 points, but you can choose to score the roll in other categories instead. Example: You roll 6-6-6-6-6. You can choose to score this as a Yatzy (50), 4 of a kind (24) or in the Upper Section ‘6’ (30).
-        }
-
-        // Returns the total sum of all dice in a given roll 
         private int Chance() // Roll anything and put it into the Chance category, the score is the total of the die faces.
         {
             var sum = 0;
@@ -582,8 +581,6 @@ namespace Yatzy
 
             return sum;
         }
-
-        // Method to hold dice.
         private void Hold()
         {
             Console.WriteLine("Type in the format of '1, 2, 3' from left to right of those dice you wish to hold.");
@@ -607,8 +604,6 @@ namespace Yatzy
                 Console.WriteLine("You didn't hold dice in the correct format, no dice selected for hold.");
             }
         }
-
-        // Method to rest held dice.
         public void ResetHold()
         {
             Console.WriteLine("Type in the format of '1, 2, 3' from left to right of those dice you wish to drop.");
@@ -632,14 +627,10 @@ namespace Yatzy
                 Console.WriteLine("You didn't drop dice in the correct format, no dice selected for drop.");
             }
         }
-
-        // Method to show the scoreboard.
         private void Score()
         {
             Scoreboard.ShowScoreboard();
         }
-
-        // Method that allows user to change to biased dice.
         private void Bias()
         {
             Console.WriteLine("Do you want a positive biased, negative biased or fair dice?\n Remember, changing the dice type mid turn will change your rolls to 0. ");
@@ -692,8 +683,6 @@ namespace Yatzy
                     }
             }
         }
-
-        // Method that checks if the game should stop.
         private bool GameShouldStop()
         {
             var GameShouldStop = true;
@@ -707,7 +696,6 @@ namespace Yatzy
             }
             return GameShouldStop;
         }
-
         // NON-GAMEPLAY FEATURES BELOW. THESE ARE ONLY HELPER METHODS FOR THE PLAYER AND EXTRA FLUFFY STUFF. //
 
         // A method that gives information about what each command does that is callable by the user upon entering 'help' into the command line.
@@ -761,8 +749,6 @@ namespace Yatzy
                 Help();
             }
         }
-
-        // Method that is callable by the user that terminates the game and prints the final score upon exit.
         private void Exit()
         {
             Console.ForegroundColor = ConsoleColor.Green;

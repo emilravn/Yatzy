@@ -11,8 +11,6 @@ namespace Yatzy
         private readonly Random Random;
         public int Current { get; set; }
         public bool Hold { get; set; }
-
-        // The normal dice is not affected by any behaviour of the user, therefore the default behaviour of a normal dice is just a random dice.
         public Dice()
         {
             Hold = false;
