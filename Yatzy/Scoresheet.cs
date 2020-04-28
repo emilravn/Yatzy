@@ -4,14 +4,10 @@ using System.Linq; // Gives access to methods that allows do all sorts of calcul
 
 namespace Yatzy
 {
-    /// <summary>
-    /// This class is responsible for the scoreboard throughout the entirety of a Yatzy Game. The constructor initiates what a scoreboard will include and as in this it resembles a scorecard of a Yatzy game.
-    /// </summary>
-    public class Scoreboard
+    public class Scoresheet
     {
-        public Dictionary<string, int?> Scorecard; // ? for nullable values
-
-        public Scoreboard()
+        public readonly Dictionary<string, int?> Scorecard; // ? for nullable values
+        public Scoresheet()
         {
             Scorecard = new Dictionary<string, int?>
             {
@@ -37,9 +33,9 @@ namespace Yatzy
 
         public void ShowScoreboard()
         {
-            foreach (KeyValuePair<string, int?> score in Scorecard)
+            foreach ((string key, int? value) in Scorecard)
             {
-                Console.WriteLine($"{score.Key} {score.Value}");
+                Console.WriteLine($"{key} {value}");
             }
             Console.WriteLine("_____________________________");
             Console.WriteLine($"Current Score: {TotalSum()}");

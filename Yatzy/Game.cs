@@ -1,35 +1,16 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
-using System.Xml.Linq;
+
 
 namespace Yatzy
 {
-    /// <summary>
-    /// You must write a very short 0.5-1.0 page document that describes the overall structure of the program. In addition, you must document any assumptions that you have made.
-    /// If you have use code that is not in the .NET library you must clearly document where the code is from and what you have used it for.
-    /// The documentation must be added as a comment at the top of the files that deal with the game class.
-    ///
-    /// Assumptions:
-    /// It is assumed that the player will overall behave accordingly as a game of Yatzhee in real life. The player can, if smart, break some of the core features if they play around with user defined commands.
-    /// To avoid too much cheating/breaking the game code, setting the biased dice will set rolls for 0 so that the user cannot keep rolling dice over and over again when selecting a bias or fair dice.
-    ///
-    /// 
-    /// </summary>
-    ///
-    /// Generelle kommentarer er dumme som f.eks. en metode gør det her, men hvis vi kommer i tanke om noget, må vi godt skrive det i kommentarer.
-    /// Hvis det er noget der hjælper os med at forstå koden, så må vi godt skrive dem.
-    /// De bedste kommentarer til en selv er i form af klasse og metode navne.
     public class Game
     {
         private readonly Dice[] diceCup = new Dice[5];
-        private readonly Scoreboard Scoreboard;
-        public int Rounds { get; set; }
+        private readonly Scoresheet _scoresheet;
+        private int[] SortedDice { get; set; }
+        private int Rounds { get; set; }
         private static int RollBones = 3;
-        // TODO: Ændres pt. to steder i programmet
 
         public Game()
         {
@@ -38,21 +19,19 @@ namespace Yatzy
                 diceCup[i] = new Dice();
             }
 
-            Scoreboard = new Scoreboard();
+            _scoresheet = new Scoresheet();
         }
         public void GameSetup()
         {
             Console.WriteLine("=============================================");
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.Write("Welcome to Yatzy 1.0");
+            Console.Write("Welcome to Yatzy 1.0 ");
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine(" (by: Ravn and Jakobsen)!");
+            Console.WriteLine("(by: Ravn and Jakobsen)!");
             Console.ResetColor();
             Console.WriteLine("=============================================");
-
             Console.WriteLine("You can get an overview of available commands by typing 'help' into the command line");
             Console.WriteLine("Type 'roll' to start the game.");
-
             GameStart();
         }
         private void GameStart()
@@ -68,7 +47,7 @@ namespace Yatzy
                         Hold();
                         break;
                     case "drop":
-                        ResetHold();
+                        DropHeld();
                         break;
                     case "options":
                         ScorePossibilities();
@@ -96,7 +75,7 @@ namespace Yatzy
         }
         private void Roll()
         {
-            if (RollBones != 0)
+            while (RollBones != 0)
             {
                 foreach (var aDice in diceCup)
                 {
@@ -107,35 +86,48 @@ namespace Yatzy
                     Console.Write($"{aDice.Current} ");
                 }
 
+                CountDice();
                 RollBones--;
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"\nRolls left: {RollBones}");
                 Console.ResetColor();
+                break;
             }
 
-            else if (RollBones == 0)
+            if (RollBones != 0) return;
+            Console.WriteLine("Out of rolls, you must 'save' a score from your current hand.");
+            CountDice();
+        }
+        /// <summary>
+        /// Method that checks for possible combinations in the lower section.
+        /// It takes a parameter 'minimum' that checks the minimum amount of dice it should check for.
+        /// It takes a second parameter 'amount' that specifices how many times a different dice value there should be.
+        /// </summary>
+        /// <param name="minimum"></param>
+        /// <param name="amount"></param>
+        /// <returns></returns>
+        private int SortDice(int minimum, int amount)
+        {
+            var sum = 0;
+            var count = 0;
+            var start = SortedDice.Length - 1;
+            for (var i = start; i >= 0; i--)
             {
-                Console.WriteLine("Out of rolls, you must 'save' a score from your current hand:");
-                foreach (var aDice in diceCup)
+                if (SortedDice[i] < minimum) continue;
+                sum += (i + 1) * minimum;
+                count++;
+                if (count == amount)
                 {
-                    Console.Write($"{aDice.Current} ");
+                    break;
                 }
             }
-        }
-        private int NumberOf(int number)
-        {
-            var count = 0;
-            foreach (var aDice in diceCup)
+
+            if (count < amount)
             {
-                if (aDice.Current == number)
-                    count++;
+                sum = 0;
             }
-
-            return count * number;
+            return sum;
         }
-
-        // This method is condensed of three other methods. The first if-statement checks whether the upper section is finished and looks into the Bonus() method that checks if the user is eligible for a bonus.
-        // The method SaveMethods() are a bunch of other saving-related methods that has been condensed for better readability.
         private void Save()
         {
             if (!CheckIfUpperShouldEnd())
@@ -153,433 +145,442 @@ namespace Yatzy
             ScorePossibilities();
             FinalSave();
             Score();
+            Console.WriteLine("This is a new round. Roll the dice!");
+        }
+        private void FinalSave()
+        {
+
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("Type in what you want to save by choosing the corresponding number.");
+            Console.ResetColor();
+
+            if (!CheckIfUpperShouldEnd())
+            {
+                try
+                {
+                    switch (Convert.ToInt32(Console.ReadLine()?.ToLower()))
+                    {
+                        case 1:
+                            if (_scoresheet.Scorecard["Aces"] == null)
+                            {
+                                _scoresheet.Scorecard["Aces"] = UpperScores(1);
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                Console.WriteLine("Aces saved!");
+                                Console.ResetColor();
+                                ResetCurrentAndHold();
+                            }
+                            else
+                            {
+                                Console.WriteLine("Aces has already been scored.");
+                            }
+
+                            break;
+                        case 2:
+                            if (_scoresheet.Scorecard["Twos"] == null)
+                            {
+                                _scoresheet.Scorecard["Twos"] = UpperScores(2);
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                Console.WriteLine("Twos saved!");
+                                Console.ResetColor();
+                                ResetCurrentAndHold();
+                            }
+                            else
+                            {
+                                Console.WriteLine("Twos has already been scored.");
+                            }
+
+                            break;
+                        case 3:
+                            if (_scoresheet.Scorecard["Threes"] == null)
+                            {
+                                _scoresheet.Scorecard["Threes"] = UpperScores(3);
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                Console.WriteLine("Threes saved!");
+                                Console.ResetColor();
+                                ResetCurrentAndHold();
+                            }
+                            else
+                            {
+                                Console.WriteLine("Threes has already been scored.");
+                            }
+
+                            break;
+                        case 4:
+                            if (_scoresheet.Scorecard["Fours"] == null)
+                            {
+                                _scoresheet.Scorecard["Fours"] = UpperScores(4);
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                Console.WriteLine("Fours saved!");
+                                Console.ResetColor();
+                                ResetCurrentAndHold();
+                            }
+                            else
+                            {
+                                Console.WriteLine("Fours has already been scored.");
+                            }
+
+                            break;
+                        case 5:
+                            if (_scoresheet.Scorecard["Fives"] == null)
+                            {
+                                _scoresheet.Scorecard["Fives"] = UpperScores(5);
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                Console.WriteLine("Fives saved!");
+                                Console.ResetColor();
+                                ResetCurrentAndHold();
+                            }
+                            else
+                            {
+                                Console.WriteLine("Fives has already been scored.");
+                            }
+
+                            break;
+                        case 6:
+                            if (_scoresheet.Scorecard["Sixes"] == null)
+                            {
+                                _scoresheet.Scorecard["Sixes"] = UpperScores(6);
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                Console.WriteLine("Sixes saved!");
+                                Console.ResetColor();
+                                ResetCurrentAndHold();
+                            }
+                            else
+                            {
+                                Console.WriteLine("Sixes has already been scored.");
+                            }
+                            break;
+                        default:
+                            Console.WriteLine("Invalid option, did you type your query correctly?");
+                            FinalSave();
+                            break;
+                    }
+                }
+                catch (FormatException)
+                {
+                    Console.WriteLine("I asked for a number, and what you typed didn't match that.");
+                }
+            }
+            else
+            {
+                try
+                {
+                    switch (Convert.ToInt32(Console.ReadLine()?.ToLower()))
+                    {
+                        case 1:
+                            if (_scoresheet.Scorecard["One Pair"] == null)
+                            {
+                                _scoresheet.Scorecard["One Pair"] = OnePair();
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                Console.WriteLine("One Pair saved!");
+                                Console.ResetColor();
+                                ResetCurrentAndHold();
+                            }
+                            else
+                            {
+                                Console.WriteLine("One pair has already been scored.");
+                            }
+                            break;
+                        case 2:
+                            if (_scoresheet.Scorecard["Two Pair"] == null)
+                            {
+                                _scoresheet.Scorecard["Two Pair"] = TwoPair();
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                Console.WriteLine("Two Pair saved!");
+                                Console.ResetColor();
+                                ResetCurrentAndHold();
+                            }
+                            else
+                            {
+                                Console.WriteLine("Two Pair has already been scored.");
+                            }
+                            break;
+                        case 3:
+                            if (_scoresheet.Scorecard["Three of a Kind"] == null)
+                            {
+                                _scoresheet.Scorecard["Three of a Kind"] = ThreeOfAKind();
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                Console.WriteLine("Three of a Kind saved!");
+                                Console.ResetColor();
+                                ResetCurrentAndHold();
+                            }
+                            else
+                            {
+                                Console.WriteLine("Three of a Kind has already been scored.");
+                            }
+                            break;
+                        case 4:
+                            if (_scoresheet.Scorecard["Four of a Kind"] == null)
+                            {
+                                _scoresheet.Scorecard["Four of a Kind"] = FourOfAKind();
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                Console.WriteLine("Four of a Kind saved!");
+                                Console.ResetColor();
+                                ResetCurrentAndHold();
+                            }
+                            else
+                            {
+                                Console.WriteLine("Four of a Kind has already been scored.");
+                            }
+                            break;
+                        case 5:
+                            if (_scoresheet.Scorecard["Small Straight"] == null)
+                            {
+                                _scoresheet.Scorecard["Small Straight"] = SmallStraight();
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                Console.WriteLine("Small Straight saved!");
+                                Console.ResetColor();
+                                ResetCurrentAndHold();
+                            }
+                            else
+                            {
+                                Console.WriteLine("Small Straight has already been scored.");
+                            }
+                            break;
+                        case 6:
+                            if (_scoresheet.Scorecard["Large Straight"] == null)
+                            {
+                                _scoresheet.Scorecard["Large Straight"] = LargeStraight();
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                Console.WriteLine("Small Straight saved!");
+                                Console.ResetColor();
+                                ResetCurrentAndHold();
+                            }
+                            else
+                            {
+                                Console.WriteLine("Large Straight has already been scored.");
+                            }
+                            break;
+                        case 7:
+                            if (_scoresheet.Scorecard["Full House"] == null)
+                            {
+                                _scoresheet.Scorecard["Full House"] = FullHouse();
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                Console.WriteLine("Full House saved!");
+                                Console.ResetColor();
+                                ResetCurrentAndHold();
+                            }
+                            else
+                            {
+                                Console.WriteLine("Full House has already been scored.");
+                            }
+                            break;
+                        case 8:
+                            if (_scoresheet.Scorecard["Yatzy"] == null)
+                            {
+                                _scoresheet.Scorecard["Yatzy"] = Yatzy();
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                Console.WriteLine("Yatzy saved!");
+                                Console.ResetColor();
+                                ResetCurrentAndHold();
+                            }
+                            else
+                            {
+                                Console.WriteLine("Yatzy has already been scored.");
+                            }
+                            break;
+                        case 9:
+                            if (_scoresheet.Scorecard["Chance"] == null)
+                            {
+                                _scoresheet.Scorecard["Chance"] = Chance();
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                Console.WriteLine("Chance saved!");
+                                Console.ResetColor();
+                                ResetCurrentAndHold();
+                            }
+                            else
+                            {
+                                Console.WriteLine("Chance has already been scored.");
+                            }
+                            break;
+                        default:
+                            Console.WriteLine("Invalid option, did you type your query correctly?");
+                            FinalSave();
+                            break;
+                    }
+                }
+                catch (FormatException)
+                {
+                    Console.WriteLine("I asked for a number, and what you typed didn't match that.");
+                }
+            }
+        }
+        private bool CheckIfUpperShouldEnd()
+        {
+            bool UpperSectionCheck = !(_scoresheet.Scorecard["Aces"] == null ||
+                                       _scoresheet.Scorecard["Twos"] == null ||
+                                       _scoresheet.Scorecard["Threes"] == null ||
+                                       _scoresheet.Scorecard["Fours"] == null ||
+                                       _scoresheet.Scorecard["Fives"] == null ||
+                                       _scoresheet.Scorecard["Sixes"] == null);
+
+            return UpperSectionCheck;
+        }
+        private int NumberOf(int number)
+        {
+            return diceCup.Count(aDice => aDice.Current == number);
+        }
+        private void CountDice()
+        {
+            var diceCount = new int[6];
+            for (var i = 0; i < diceCount.Length; i++)
+            {
+                diceCount[i] = NumberOf(i + 1);
+            }
+
+            SortedDice = diceCount;
         }
         private void ScorePossibilities()
         {
             if (!CheckIfUpperShouldEnd())
             {
-                if (Scoreboard.Scorecard["Aces"] == null)
+                if (_scoresheet.Scorecard["Aces"] == null)
                 {
-                    Console.WriteLine($"You can score in (1) Aces for {NumberOf(1)} points!");
+                    Console.WriteLine($"You can score in (1) Aces for {UpperScores(1)} points!");
                 }
-                if (Scoreboard.Scorecard["Twos"] == null)
+                if (_scoresheet.Scorecard["Twos"] == null)
                 {
-                    Console.WriteLine($"You can score in (2) Twos for {NumberOf(2)} points!");
+                    Console.WriteLine($"You can score in (2) Twos for {UpperScores(2)} points!");
                 }
-                if (Scoreboard.Scorecard["Threes"] == null)
+                if (_scoresheet.Scorecard["Threes"] == null)
                 {
-                    Console.WriteLine($"You can score in (3) Threes for {NumberOf(3)} points!");
+                    Console.WriteLine($"You can score in (3) Threes for {UpperScores(3)} points!");
                 }
-                if (Scoreboard.Scorecard["Fours"] == null)
+                if (_scoresheet.Scorecard["Fours"] == null)
                 {
-                    Console.WriteLine($"You can score in (4) Fours for {NumberOf(4)} points!");
+                    Console.WriteLine($"You can score in (4) Fours for {UpperScores(4)} points!");
                 }
-                if (Scoreboard.Scorecard["Fives"] == null)
+                if (_scoresheet.Scorecard["Fives"] == null)
                 {
-                    Console.WriteLine($"You can score in (5) Fives for {NumberOf(5)} points!");
+                    Console.WriteLine($"You can score in (5) Fives for {UpperScores(5)} points!");
                 }
-                if (Scoreboard.Scorecard["Sixes"] == null)
+                if (_scoresheet.Scorecard["Sixes"] == null)
                 {
-                    Console.WriteLine($"You can score in (6) Sixes for {NumberOf(6)} points!");
+                    Console.WriteLine($"You can score in (6) Sixes for {UpperScores(6)} points!");
                 }
             }
             else
             {
-                if (Scoreboard.Scorecard["One Pair"] == null)
+                if (_scoresheet.Scorecard["One Pair"] == null)
                 {
                     Console.WriteLine($"You can score in (1) One Pair for {OnePair()} points!");
                 }
-                if (Scoreboard.Scorecard["Two Pair"] == null)
+                if (_scoresheet.Scorecard["Two Pair"] == null)
                 {
                     Console.WriteLine($"You can score in (2) Two Pair for {TwoPair()} points!");
                 }
-                if (Scoreboard.Scorecard["Three of a Kind"] == null)
+                if (_scoresheet.Scorecard["Three of a Kind"] == null)
                 {
                     Console.WriteLine($"You can score in (3) Three of a Kind for {ThreeOfAKind()} points!");
                 }
-                if (Scoreboard.Scorecard["Four of a Kind"] == null)
+                if (_scoresheet.Scorecard["Four of a Kind"] == null)
                 {
                     Console.WriteLine($"You can score in (4) Four of a Kind for {FourOfAKind()} points!");
                 }
-                if (Scoreboard.Scorecard["Small Straight"] == null)
+                if (_scoresheet.Scorecard["Small Straight"] == null)
                 {
                     Console.WriteLine($"You can score in (5) Small Straight for {SmallStraight()} points!");
                 }
-                if (Scoreboard.Scorecard["Large Straight"] == null)
+                if (_scoresheet.Scorecard["Large Straight"] == null)
                 {
                     Console.WriteLine($"You can score in (6) Large Straight for {LargeStraight()} points!");
                 }
-                if (Scoreboard.Scorecard["Full House"] == null)
+                if (_scoresheet.Scorecard["Full House"] == null)
                 {
                     Console.WriteLine($"You can score in (7) Full House for {FullHouse()} points!");
                 }
-                if (Scoreboard.Scorecard["Yatzy"] == null)
+                if (_scoresheet.Scorecard["Yatzy"] == null)
                 {
                     Console.WriteLine($"You can score in (8) Yatzy for {Yatzy()} points!");
                 }
-                if (Scoreboard.Scorecard["Chance"] == null)
+                if (_scoresheet.Scorecard["Chance"] == null)
                 {
                     Console.WriteLine($"You can score in (9) Chance for {Chance()} points!");
                 }
             }
         }
-        public void FinalSave()
+        private int UpperScores(int number)
         {
+            var count = diceCup.Count(aDice => aDice.Current == number);
 
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("Type in what you want to save by choosing the appropriate number.");
-            Console.ResetColor();
-
-            if (!CheckIfUpperShouldEnd())
-            {
-                switch (Convert.ToInt32(Console.ReadLine()?.ToLower()))
-                {
-                    case 1:
-                        if (Scoreboard.Scorecard["Aces"] == null)
-                        {
-                            Scoreboard.Scorecard["Aces"] = NumberOf(1);
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("Aces saved!");
-                            Console.ResetColor();
-                            ResetCurrentAndHold();
-                        }
-                        else
-                        {
-                            Console.WriteLine("Aces has already been scored.");
-                        }
-
-                        break;
-                    case 2:
-                        if (Scoreboard.Scorecard["Twos"] == null)
-                        {
-                            Scoreboard.Scorecard["Twos"] = NumberOf(2);
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("Twos saved!");
-                            Console.ResetColor();
-                            ResetCurrentAndHold();
-                        }
-                        else
-                        {
-                            Console.WriteLine("Twos has already been scored.");
-                        }
-
-                        break;
-                    case 3:
-                        if (Scoreboard.Scorecard["Threes"] == null)
-                        {
-                            Scoreboard.Scorecard["Threes"] = NumberOf(3);
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("Threes saved!");
-                            Console.ResetColor();
-                            ResetCurrentAndHold();
-                        }
-                        else
-                        {
-                            Console.WriteLine("Threes has already been scored.");
-                        }
-
-                        break;
-                    case 4:
-                        if (Scoreboard.Scorecard["Fours"] == null)
-                        {
-                            Scoreboard.Scorecard["Fours"] = NumberOf(4);
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("Fours saved!");
-                            Console.ResetColor();
-                            ResetCurrentAndHold();
-                        }
-                        else
-                        {
-                            Console.WriteLine("Fours has already been scored.");
-                        }
-
-                        break;
-                    case 5:
-                        if (Scoreboard.Scorecard["Fives"] == null)
-                        {
-                            Scoreboard.Scorecard["Fives"] = NumberOf(5);
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("Fives saved!");
-                            Console.ResetColor();
-                            ResetCurrentAndHold();
-                        }
-                        else
-                        {
-                            Console.WriteLine("Fives has already been scored.");
-                        }
-
-                        break;
-                    case 6:
-                        if (Scoreboard.Scorecard["Sixes"] == null)
-                        {
-                            Scoreboard.Scorecard["Sixes"] = NumberOf(6);
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("Sixes saved!");
-                            Console.ResetColor();
-                            ResetCurrentAndHold();
-                        }
-                        else
-                        {
-                            Console.WriteLine("Sixes has already been scored.");
-                        }
-                        break;
-                    default:
-                        Console.WriteLine("Invalid option, did you type your query correctly?");
-                        FinalSave();
-                        break;
-                }
-            }
-            else
-            {
-                switch (Convert.ToInt32(Console.ReadLine()?.ToLower()))
-                {
-                    case 1:
-                        if (Scoreboard.Scorecard["One Pair"] == null)
-                        {
-                            Scoreboard.Scorecard["One Pair"] = OnePair();
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("One Pair saved!");
-                            Console.ResetColor();
-                            ResetCurrentAndHold();
-                        }
-                        else
-                        {
-                            Console.WriteLine("One pair has already been scored.");
-                        }
-
-                        break;
-                    case 2:
-                        if (Scoreboard.Scorecard["Two Pair"] == null)
-                        {
-                            Scoreboard.Scorecard["Two Pair"] = TwoPair();
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("Two Pair saved!");
-                            Console.ResetColor();
-                            ResetCurrentAndHold();
-                        }
-                        else
-                        {
-                            Console.WriteLine("Two Pair has already been scored.");
-                        }
-
-                        break;
-                    case 3:
-                        if (Scoreboard.Scorecard["Three of a Kind"] == null)
-                        {
-                            Scoreboard.Scorecard["Three of a Kind"] = ThreeOfAKind();
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("Three of a Kind saved!");
-                            Console.ResetColor();
-                            ResetCurrentAndHold();
-                        }
-                        else
-                        {
-                            Console.WriteLine("Three of a Kind has already been scored.");
-                        }
-
-                        break;
-                    case 4:
-                        if (Scoreboard.Scorecard["Four of a Kind"] == null)
-                        {
-                            Scoreboard.Scorecard["Four of a Kind"] = FourOfAKind();
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("Four of a Kind saved!");
-                            Console.ResetColor();
-                            ResetCurrentAndHold();
-                        }
-                        else
-                        {
-                            Console.WriteLine("Four of a Kind has already been scored.");
-                        }
-
-                        break;
-                    case 5:
-                        if (Scoreboard.Scorecard["Small Straight"] == null)
-                        {
-                            Scoreboard.Scorecard["Small Straight"] = SmallStraight();
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("Small Straight saved!");
-                            Console.ResetColor();
-                            ResetCurrentAndHold();
-                        }
-                        else
-                        {
-                            Console.WriteLine("Small Straight has already been scored.");
-                        }
-
-                        break;
-                    case 6:
-                        if (Scoreboard.Scorecard["Large Straight"] == null)
-                        {
-                            Scoreboard.Scorecard["Large Straight"] = LargeStraight();
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("Small Straight saved!");
-                            Console.ResetColor();
-                            ResetCurrentAndHold();
-                        }
-                        else
-                        {
-                            Console.WriteLine("Large Straight has already been scored.");
-                        }
-                        break;
-                    case 7:
-                        if (Scoreboard.Scorecard["Full House"] == null)
-                        {
-                            Scoreboard.Scorecard["Full House"] = FullHouse();
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("Full House saved!");
-                            Console.ResetColor();
-                            ResetCurrentAndHold();
-                        }
-                        else
-                        {
-                            Console.WriteLine("Full House has already been scored.");
-                        }
-                        break;
-                    case 8:
-                        if (Scoreboard.Scorecard["Yatzy"] == null)
-                        {
-                            Scoreboard.Scorecard["Yatzy"] = Yatzy();
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("Yatzy saved!");
-                            Console.ResetColor();
-                            ResetCurrentAndHold();
-                        }
-                        else
-                        {
-                            Console.WriteLine("Yatzy has already been scored.");
-                        }
-                        break;
-                    case 9:
-                        if (Scoreboard.Scorecard["Chance"] == null)
-                        {
-                            Scoreboard.Scorecard["Chance"] = Chance();
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("Chance saved!");
-                            Console.ResetColor();
-                            ResetCurrentAndHold();
-                        }
-                        else
-                        {
-                            Console.WriteLine("Chance has already been scored.");
-                        }
-                        break;
-                    default:
-                        Console.WriteLine("Invalid option, did you type your query correctly?");
-                        FinalSave();
-                        break;
-                }
-            }
+            return count * number;
         }
-
-        public void ResetCurrentAndHold()
+        private void Bonus()
         {
-            foreach (var aDice in diceCup)
+            if (_scoresheet.TotalSum() >= 63 && CheckIfUpperShouldEnd())
             {
-                aDice.Current = 0;
-                aDice.Hold = false;
-            }
-
-            RollBones = 3; // TODO: Ændres pt. to steder i programmet.
-            Rounds++;
-        }
-        public void Bonus()
-        {
-            if (Scoreboard.TotalSum() >= 63 && CheckIfUpperShouldEnd())
-            {
-                Scoreboard.Scorecard["Bonus"] = 50;
-                Console.WriteLine("For having a sum greater than 62, you get 50 bonus points!\nLower Section: UNLOCKED");
+                _scoresheet.Scorecard["Bonus"] = 50;
+                Console.WriteLine("For having a sum greater than 62, you get 50 bonus points!");
             }
             else if (CheckIfUpperShouldEnd())
             {
-                Scoreboard.Scorecard["Bonus"] = 0;
-                Console.WriteLine("Sum is not greater than 63, therefore you don't get 50 bonus points.\nLower Section: UNLOCKED");
+                _scoresheet.Scorecard["Bonus"] = 0;
+                Console.WriteLine("Sum is not greater than 63, therefore you don't get 50 bonus points.");
             }
         }
-
-        // Method that checks if the upper section of Yatzy is done. Method returns true if there has been a score in all of the scoring possibilities in the upper section.
-        public bool CheckIfUpperShouldEnd()
+        private int OnePair()
         {
-            bool UpperSectionCheck = !(Scoreboard.Scorecard["Aces"] == null ||
-                                       Scoreboard.Scorecard["Twos"] == null ||
-                                       Scoreboard.Scorecard["Threes"] == null ||
-                                       Scoreboard.Scorecard["Fours"] == null ||
-                                       Scoreboard.Scorecard["Fives"] == null ||
-                                       Scoreboard.Scorecard["Sixes"] == null);
-
-            return UpperSectionCheck;
-        }
-        public int OnePair() // 2 dice with the same faces. The score is the total of these two die faces.
-        {
-            var sum = 0;
-            for (int i = 6; i >= 1; i--)
-            {
-                if (NumberOf(i) > 1)
-                {
-                    sum = NumberOf(i) * 2;
-                }
-            }
+            var sum = SortDice(2, 1);
             return sum;
         }
-        public int TwoPair() // One pair, and another pair of dice with different faces from each other. The score is the total of these four die faces. Example: 6+6+5+5=22
+        private int TwoPair()
         {
-            var sum = 0;
-            return sum;
-
-        }
-        public int ThreeOfAKind() //  For 3 of a kind, 3 die faces must be the same; for 4 of a kind, 4 must be the same. The score is the total of all the 3 or 4 dice
-        {
-            var sum = 0;
-
+            var sum = SortDice(2, 2);
             return sum;
         }
-
-        // TODO: Description
-        public int FourOfAKind() //  For 3 of a kind, 3 die faces must be the same; for 4 of a kind, 4 must be the same. The score is the total of all the 3 or 4 dice
+        private int ThreeOfAKind()
         {
-            var sum = 0;
+            var sum = SortDice(3, 1);
             return sum;
-
         }
-        public int SmallStraight()
+        private int FourOfAKind()
+        {
+            var sum = SortDice(4, 1);
+            return sum;
+        }
+        private int SmallStraight()
         {
             var sum = 0;
-            if (NumberOf(1) == 1 && NumberOf(2) == 2 && NumberOf(3) == 3 && NumberOf(4) == 4 && NumberOf(5) == 5)
+            if (UpperScores(1) == 1 && UpperScores(2) == 2 && UpperScores(3) == 3 && UpperScores(4) == 4 && UpperScores(5) == 5)
             {
                 sum = 15;
             }
             return sum;
-
         }
-        public int LargeStraight()
+        private int LargeStraight()
         {
             var sum = 0;
-            if (NumberOf(2) == 2 && NumberOf(3) == 3 && NumberOf(4) == 4 && NumberOf(5) == 5 && NumberOf(6) == 6)
+            if (UpperScores(2) == 2 && UpperScores(3) == 3 && UpperScores(4) == 4 && UpperScores(5) == 5 && UpperScores(6) == 6)
             {
                 sum = 20;
             }
             return sum;
         }
-        public int FullHouse() //  A Full House as in poker is a combination of 3 of a kind and 2 of a kind. The score is the total of the die faces. Example: 6+6+6+5+5=28
+        private int FullHouse() 
         {
             var sum = 0;
-            return sum;
-        }
-        public int Yatzy()  // Yatzy is 5 of a kind and scores 50 points, but you can choose to score the roll in other categories instead. Example: You roll 6-6-6-6-6. You can choose to score this as a Yatzy (50), 4 of a kind (24) or in the Upper Section ‘6’ (30).
-        {
-            var sum = 0;
-            return sum;
-
-        }
-        private int Chance() // Roll anything and put it into the Chance category, the score is the total of the die faces.
-        {
-            var sum = 0;
-            foreach (var aDice in diceCup)
+            var threeKind = ThreeOfAKind();
+            var onePair = OnePair();
+            var twoPair = TwoPair();
+            if (threeKind == 0 || twoPair == 0)
             {
-                sum += aDice.Current;
+                return sum;
             }
 
+            sum = threeKind / 3 == onePair / 2 ? threeKind + (twoPair - onePair) : threeKind + onePair;
             return sum;
+        }
+        private int Yatzy()
+        {
+            var sum = SortDice(5, 1);
+            if (sum < 0)
+            {
+                sum += 50;
+            }
+            return sum;
+        }
+        private int Chance()
+        {
+            return diceCup.Sum(aDice => aDice.Current);
         }
         private void Hold()
         {
@@ -588,65 +589,66 @@ namespace Yatzy
             {
                 var heldList = Console.ReadLine()?.Split(',').Select(int.Parse).ToList(); // ToList --> let's make a copy, work on that and then transfer it back to the original.
 
-                if (heldList != null)
+                if (heldList == null) return;
+                foreach (var heldDice in heldList)
                 {
-                    foreach (var heldDice in heldList)
-                    {
-                        diceCup.ElementAt(heldDice - 1).Hold = true;
-                    }
-
-                    Console.WriteLine("Dice held successfully");
+                    diceCup.ElementAt(heldDice - 1).Hold = true;
                 }
-
+                Console.WriteLine("Dice held successfully!\nKeep rolling.");
             }
             catch (Exception)
             {
-                Console.WriteLine("You didn't hold dice in the correct format, no dice selected for hold.");
+                Console.WriteLine("You didn't hold the dice in the correct format, no dice selected for hold.");
             }
         }
-        public void ResetHold()
+        private void DropHeld()
         {
             Console.WriteLine("Type in the format of '1, 2, 3' from left to right of those dice you wish to drop.");
             try
             {
                 var heldList = Console.ReadLine()?.Split(',').Select(int.Parse).ToList();
 
-                if (heldList != null)
+                if (heldList == null) return;
+                foreach (var heldDice in heldList)
                 {
-                    foreach (var heldDice in heldList)
-                    {
-                        diceCup.ElementAt(heldDice - 1).Hold = false;
-                    }
-
-                    Console.WriteLine("Dice dropped successfully");
+                    diceCup.ElementAt(heldDice - 1).Hold = false;
                 }
-
+                Console.WriteLine("Dice dropped successfully!");
             }
             catch (Exception)
             {
-                Console.WriteLine("You didn't drop dice in the correct format, no dice selected for drop.");
+                Console.WriteLine("You didn't drop the dice in the correct format, no dice selected for drop.");
             }
+        }
+        private void ResetCurrentAndHold()
+        {
+            foreach (var aDice in diceCup)
+            {
+                aDice.Current = 0;
+                aDice.Hold = false;
+            }
+            RollBones = 3;
+            Rounds++;
         }
         private void Score()
         {
-            Scoreboard.ShowScoreboard();
+            _scoresheet.ShowScoreboard();
         }
         private void Bias()
         {
-            Console.WriteLine("Do you want a positive biased, negative biased or fair dice?\n Remember, changing the dice type mid turn will change your rolls to 0. ");
-            string changeDice = Console.ReadLine();
+            Console.WriteLine("Do you want a positive biased, negative biased or fair dice?\nRemember, changing the dice type mid turn will change your rolls to 0.");
+            var changeDice = Console.ReadLine();
             int changeDegree;
             switch (changeDice)
             {
                 case "positive":
-                    Console.WriteLine(
-                        "How biased do you want the positive dice to be?\nSelect from low (1) to high (3).");
-                    changeDegree = Convert.ToInt32(Console.ReadLine());
+                    Console.WriteLine("How biased do you want the positive dice to be?\nSelect from low (1) to medium (2) to high (3).");
+                    changeDegree = Convert.ToInt32(Console.ReadLine()?.ToLower());
                     while (changeDegree <= 1 && changeDegree >= 3)
                     {
                         Console.WriteLine("Error invalid entry");
                         Console.Write("Enter a valid range: ");
-                        changeDegree = int.Parse(Console.ReadLine());
+                        changeDegree = int.Parse(Console.ReadLine()?.ToLower() ?? throw new InvalidOperationException());
                     }
                     for (var i = 0; i < diceCup.Length; i++)
                     {
@@ -655,17 +657,17 @@ namespace Yatzy
                     Console.WriteLine($"You have successfully equipped yourself with {changeDice} dice with a degree of {changeDegree}!");
                     break;
                 case "negative":
-                    Console.WriteLine("How biased do you want the negative dice?\nSelect from low (1) to high (3).");
-                    changeDegree = Convert.ToInt32(Console.ReadLine());
+                    Console.WriteLine("How biased do you want the negative dice to be?\nSelect from low (1) to medium (2) to high (3).");
+                    changeDegree = Convert.ToInt32(Console.ReadLine()?.ToLower());
                     while (changeDegree <= 1 && changeDegree >= 3)
                     {
                         Console.WriteLine("Error invalid entry");
                         Console.Write("Enter a valid range: ");
-                        changeDegree = int.Parse(Console.ReadLine());
+                        changeDegree = int.Parse(Console.ReadLine()?.ToLower() ?? throw new InvalidOperationException());
                     }
                     for (var i = 0; i < diceCup.Length; i++)
                     {
-                        diceCup[i] = new BiasedDice(changeDegree, false);
+                        diceCup[i] = new BiasedDice(changeDegree, true);
                     }
                     Console.WriteLine($"You have successfully equipped yourself with {changeDice} dice with a degree of {changeDegree}!");
                     break;
@@ -678,27 +680,11 @@ namespace Yatzy
                     break;
                 default:
                     {
-                        Console.WriteLine("Nothing changed! Good day to you!");
+                        Console.WriteLine("Nothing changed! Have a good game!");
                         break;
                     }
             }
         }
-        private bool GameShouldStop()
-        {
-            var GameShouldStop = true;
-            if (Rounds != 15)
-            {
-                GameShouldStop = false;
-            }
-            else
-            {
-                Exit();
-            }
-            return GameShouldStop;
-        }
-        // NON-GAMEPLAY FEATURES BELOW. THESE ARE ONLY HELPER METHODS FOR THE PLAYER AND EXTRA FLUFFY STUFF. //
-
-        // A method that gives information about what each command does that is callable by the user upon entering 'help' into the command line.
         private static void Help()
         {
             Console.WriteLine("1. Roll");
@@ -709,6 +695,7 @@ namespace Yatzy
             Console.WriteLine("6. Options");
             Console.WriteLine("7. Bias");
             Console.WriteLine("8. Exit");
+            Console.WriteLine("Enter the corresponding number you need help to.");
 
             try
             {
@@ -724,7 +711,7 @@ namespace Yatzy
                         Console.WriteLine("You can use the 'drop' command to drop a held die.");
                         break;
                     case 4:
-                        Console.WriteLine("You can use the 'save' command to save a score to the scoreboard. This is final.");
+                        Console.WriteLine("You can use the 'save' command to save a score to the scoreboard.\nThis is final and will result in the loss of remaining rolls.");
                         break;
                     case 5:
                         Console.WriteLine("You can use the 'score' command to view the current scoreboard.");
@@ -749,11 +736,25 @@ namespace Yatzy
                 Help();
             }
         }
+        private bool GameShouldStop()
+        {
+            var GameShouldStop = true;
+            if (Rounds != 15)
+            {
+                GameShouldStop = false;
+            }
+            else
+            {
+                Exit();
+            }
+            return GameShouldStop;
+        }
         private void Exit()
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"Thank you very much for playing!\nYour final score was: {Scoreboard.TotalSum()}");
+            Console.WriteLine($"Thank you very much for playing!\nYour final score was: {_scoresheet.TotalSum()}");
             Console.ResetColor();
+            Console.ReadKey();
             Environment.Exit(1);
         }
     }
