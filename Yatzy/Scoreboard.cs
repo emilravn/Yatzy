@@ -9,34 +9,36 @@ namespace Yatzy
     /// </summary>
     public class Scoreboard
     {
-        public Dictionary<string, int> Scorecard;
+        public Dictionary<string, int?> Scorecard; // ? for nullable values
 
         public Scoreboard()
         {
-            Scorecard = new Dictionary<string, int>
+            Scorecard = new Dictionary<string, int?>
             {
-                {"Aces", -1},
-                {"Twos", -1},
-                {"Threes", -1},
-                {"Fours", -1},
-                {"Fives", -1},
-                {"Sixes", -1},
-                {"One Pair", -1},
-                {"Two Pair", -1},
-                {"Three of a Kind", -1},
-                {"Four of a Kind", -1},
-                {"Full House", -1},
-                {"Small Straight", -1},
-                {"Large Straight", -1},
-                {"Yatzy", -1},
-                {"Chance", -1}
+                {"Aces", null},
+                {"Twos", null},
+                {"Threes", null},
+                {"Fours", null},
+                {"Fives", null},
+                {"Sixes", null},
+                {"Bonus", null},
+                {"One Pair", null},
+                {"Two Pair", null},
+                {"Three of a Kind", null},
+                {"Four of a Kind", null},
+                {"Full House", null},
+                {"Small Straight", null},
+                {"Large Straight", null},
+                {"Yatzy", null},
+                {"Chance", null}
             };
+
         }
 
         // This methods simply shows the user the current scoreboard upon typing 'score' into the command line.
         public void ShowScoreboard()
         {
-            foreach (KeyValuePair<string, int> score in Scorecard)
+            foreach (KeyValuePair<string, int?> score in Scorecard)
             {
                 Console.WriteLine($"{score.Key} {score.Value}");
             }
@@ -45,7 +47,7 @@ namespace Yatzy
         }
 
         // This method calculates the total sum of all values in the scoreboard.
-        public int TotalSum()
+        public int? TotalSum()
         {
             return Scorecard.Sum(scores => scores.Value);
         }

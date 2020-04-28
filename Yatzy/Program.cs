@@ -1,10 +1,13 @@
 ﻿namespace Yatzy
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static class Program
     {
         private static void Main()
         {
-            var Yatzy = new Game();
+            Game Yatzy = new Game();
             Yatzy.GameSetup();
         }
     }

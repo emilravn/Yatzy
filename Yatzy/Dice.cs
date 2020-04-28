@@ -1,12 +1,16 @@
 using System;
+using System.Linq;
 
 namespace Yatzy
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class Dice
     {
-        public readonly Random Random;
+        private readonly Random Random;
         public int Current { get; set; }
-        public bool Hold { get; set; } // TODO: You must be able to hold the current value of the dice.
+        public bool Hold { get; set; }
 
         // The normal dice is not affected by any behaviour of the user, therefore the default behaviour of a normal dice is just a random dice.
         public Dice()
@@ -31,10 +35,12 @@ namespace Yatzy
         }
     }
 
+    // TODO: Description
+    // TODO: Degree should be reworked.
     public class BiasedDice : Dice
     {
-        public int DieDegree { get; set; }
-        public bool DieNegative { get; set; } = true;
+        private int DieDegree { get; set; }
+        private bool DieNegative { get; set; } = true;
 
         // When biased dice is being selected for use, this will be the default behaviour of those dice.
         public BiasedDice()
@@ -46,7 +52,7 @@ namespace Yatzy
         public BiasedDice(int DieDegree, bool dieNegative)
         {
             this.DieDegree = DieDegree;
-            this.DieNegative = dieNegative;
+            DieNegative = dieNegative;
         }
 
         public override int Roll()
@@ -61,6 +67,7 @@ namespace Yatzy
                         {
                             base.Roll();
                         }
+                        // While (avg(Current) != 3.5) base.Roll)
                         break;
                     case 2: // You can hit 4 but you can't hit over 4.
                         while (Current > 4)
@@ -103,7 +110,6 @@ namespace Yatzy
                         break;
                     default:
                         return Current;
-
                 }
             }
             return Current;
