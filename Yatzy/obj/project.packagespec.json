@@ -1,10 +1,10 @@
 ﻿{
   "version": "1.0.0",
   "restore": {
-    "projectUniqueName": "/home/emil/Desktop/Yatzy/Yatzy/Yatzy.csproj",
+    "projectUniqueName": "/home/emil/Code/C#_GOOP/yatzhee/Yatzy/Yatzy.csproj",
     "projectName": "Yatzy",
-    "projectPath": "/home/emil/Desktop/Yatzy/Yatzy/Yatzy.csproj",
-    "outputPath": "/home/emil/Desktop/Yatzy/Yatzy/obj/",
+    "projectPath": "/home/emil/Code/C#_GOOP/yatzhee/Yatzy/Yatzy.csproj",
+    "outputPath": "/home/emil/Code/C#_GOOP/yatzhee/Yatzy/obj/",
     "projectStyle": "PackageReference",
     "originalTargetFrameworks": [
       "netcoreapp3.1"
@@ -40,7 +40,7 @@
           "privateAssets": "all"
         }
       },
-      "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/3.1.201/RuntimeIdentifierGraph.json"
+      "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/3.1.401/RuntimeIdentifierGraph.json"
     }
   }
 }

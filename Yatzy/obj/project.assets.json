@@ -8,26 +8,24 @@
     ".NETCoreApp,Version=v3.1": []
   },
   "packageFolders": {
-    "C:\\Users\\emilr\\.nuget\\packages\\": {}
+    "/home/emil/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\emilr\\Desktop\\Yatzy\\Yatzy\\Yatzy.csproj",
+      "projectUniqueName": "/home/emil/Code/C#_GOOP/yatzhee/Yatzy/Yatzy.csproj",
       "projectName": "Yatzy",
-      "projectPath": "C:\\Users\\emilr\\Desktop\\Yatzy\\Yatzy\\Yatzy.csproj",
-      "packagesPath": "C:\\Users\\emilr\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\emilr\\Desktop\\Yatzy\\Yatzy\\obj\\",
+      "projectPath": "/home/emil/Code/C#_GOOP/yatzhee/Yatzy/Yatzy.csproj",
+      "packagesPath": "/home/emil/.nuget/packages/",
+      "outputPath": "/home/emil/Code/C#_GOOP/yatzhee/Yatzy/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\emilr\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "/home/emil/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "netcoreapp3.1"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -58,7 +56,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.201\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/3.1.401/RuntimeIdentifierGraph.json"
       }
     }
   }
