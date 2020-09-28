@@ -13,21 +13,19 @@ namespace Yatzy
             Random = new Random();
         }
 
-        public virtual int Roll()
+        public virtual void Roll()
         {
             if (Hold == false)
             {
                 Current = Random.Next(1, 7);
-
             }
-            return Current;
         }
     }
 
     public class BiasedDice : Dice
     {
-        private int DieDegree { get; set; }
-        private bool DieNegative { get; set; }
+        private int DieDegree { get; }
+        private bool DieNegative { get; }
 
         public BiasedDice(int DieDegree, bool dieNegative)
         {
@@ -35,7 +33,7 @@ namespace Yatzy
             DieNegative = dieNegative;
         }
 
-        public override int Roll()
+        public override void Roll()
         {
             base.Roll();
             if (DieNegative) // The dice will be negative (true).
@@ -62,7 +60,7 @@ namespace Yatzy
                         }
                         break;
                     default:
-                        return Current;
+                        return;
 
                 }
             }
@@ -89,10 +87,9 @@ namespace Yatzy
                         }
                         break;
                     default:
-                        return Current;
+                        return;
                 }
             }
-            return Current;
         }
     }
 }
